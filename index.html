@@ -1,27 +1,26 @@
 <!doctype html>
 <meta charset="utf-8" />
-<meta name="color-scheme" content="dark light" />
+<meta name="color-scheme" content="dark" />
 <meta name="robots" content="noindex" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <style>
-@font-face {
-    font-family: 'JetBrains Mono';
-    src: url('assets/fonts/jetbrainsmono/JetBrainsMonoNerdFont_Regular.ttf') format('truetype');
-}
-:root {
-	--border-radius: 1rem;
-	--color-background: #111;
-	--color-text-subtle: #888;
-	--color-text: #eee;
-    --font-family: 'JetBrains Mono', sans-serif;
-	--font-size: clamp(16px, 1.6vw, 18px);
-	--font-weight-bold: 700;
-	--font-weight-normal: 400;
-	--space: 1rem;
-	--transition-speed: 200ms;
-}
-
+	@font-face {
+		font-family: 'JetBrains';
+		src: local('JetBrains Mono Nerd Font'), local('JetBrainsMonoNerdFont_Regular'), url('assets/fonts/jetbrainsmono/JetBrainsMonoNerdFont_Regular.ttf') format('truetype');
+	}
+	:root {
+		--border-radius: 1rem;
+		--color-background: #111;
+		--color-text-subtle: #888;
+		--color-text: #eee;
+		--font-family: 'JetBrains Mono', sans-serif;
+		--font-size: clamp(16px, 1.6vw, 18px);
+		--font-weight-bold: 700;
+		--font-weight-normal: 400;
+		--space: 1rem;
+		--transition-speed: 100ms;
+	}
 	@media (prefers-color-scheme: light) {
 		:root {
 			--color-background: #e8e8e8;
@@ -37,54 +36,83 @@
 		commandSearchDelimiter: ' ',
 		defaultSearchTemplate: 'https://duckduckgo.com/?q={}',
 		openLinksInNewTab: false,
-		suggestionLimit: 0,
+		suggestionLimit: 5,
 	};
 
 	const COMMANDS = new Map([
+		['mc', { name: 'MyCourses', url: 'https://mycourses.cccs.edu/d2l/home/6669' }],
+		['v', { name: 'Vault', url: 'https://github.com/clamsfeel2/Vault', searchTemplate: '/clamsfeel2/Vault/tree/main/{}' }],
+		['p', { name: 'Pomodoro', url: 'https://pomofocus.io/' }],
+
 		['m', { name: 'Mail', url: 'https://mail.proton.me/u/0/inbox' }],
 		['c', { name: 'Calendar', url: 'https://calendar.proton.me' }],
-		[
-			'd',
-			{ name: 'Drive', url: 'https://drive.proton.me' },
-		],
-		 ['g', { name: 'GitHub', url: 'https://github.com', searchTemplate: '/search?q={}' }],
-		['a', { name: 'Chat', url: 'https://chat.openai.com' }],
-		['p', { name: 'Pomodoro', url: 'https://pomodoro.xvvvyz.xyz' }],
-		[
-			'r',
-			{
-				name: 'Reddit',
-				suggestions: [
-					'r/r/unixporn',
-					'r/r/archlinux',
-					'r/r/commandline',
-					'r/r/catswithjobs',
-				],
-				url: 'https://reddit.com',
-				searchTemplate: '/search/?q={}'
-			},
-		],
+		['d', { name: 'Drive', url: 'https://drive.proton.me' }],
+
+		['aw', {
+			name: 'ArchWiki',
+			suggestions: [
+				'aw Lenovo_ThinkPad_X1_Carbon_(Gen_9)',
+				'aw Systemd',
+				'aw NetworkManager',
+				'aw Fprint',
+			],
+			url: 'https://wiki.archlinux.org',
+			searchTemplate: '/index.php?search={}',
+		}],
+		['alp', {
+			name: 'APKG',
+			suggestions: [
+				'alp Hyprland',
+			],
+			url: 'https://archlinux.org',
+			searchTemplate: '/packages/?sort=&q={}',
+		}],
+		['aur', {
+			name: 'AUR',
+			suggestions: [
+				'aur Hyprland-git',
+			],
+			url: 'https://aur.archlinux.org',
+			searchTemplate: '/packages/?K={}',
+		}],
+
+		['g', {
+			name: 'GitHub',
+			suggestions: [
+				'g/clamsfeel2/Vault',
+				'g/clamsfeel2/memify',
+				'g/clamsfeel2/tinytask',
+			],
+			url: 'https://github.com/clamsfeel2',
+			searchTemplate: '/search?q={}'
+		}],
+		['r', {
+			name: 'Reddit',
+			suggestions: [
+				'r/r/unixporn',
+				'r/r/archlinux',
+				'r/r/commandline',
+				'r/r/catswithjobs',
+			],
+			url: 'https://reddit.com',
+			searchTemplate: '/search/?q={}'
+		}],
+		['y', {
+			name: 'YouTube',
+			searchTemplate: '/results?search_query={}',
+			url: 'https://youtube.com',
+		}],
+
 		['t', { name: 'Translate', url: 'https://www.deepl.com/translator' }],
-		[
-			'y',
-			{
-				name: 'YouTube',
-				searchTemplate: '/results?search_query={}',
-				url: 'https://youtube.com',
-			},
-		],
-		 [
-		   's',
-		   {
-		     name: 'Syncthing',
-		     searchTemplate: ':{}',
-		     suggestions: ['0 54323', '0 54324'],
-		     url: 'http://localhost:8384',
-		   },
-		 ],
-		['mc', { name: 'MyCourses', url: 'https://mycourses.cccs.edu/d2l/home/6669' }],
-		['v', { name: 'Vault', url: 'https://github.com/clamsfeel2/Vault'}]
+		['s', {
+			name: 'Syncthing',
+			suggestions: ['0 54323', '0 54324'],
+			searchTemplate: ':{}',
+			url: 'http://localhost:8384',
+		}],
+		['a', { name: 'Chat', url: 'https://chat.openai.com' }],
 	]);
+
 </script>
 
 <template id="commands-template">
@@ -148,7 +176,7 @@
 
 	@media (min-width: 900px) {
 		.commands {
-			columns: 4;
+			columns: 5;
 			max-width: 45rem;
 		}
 	}
@@ -177,12 +205,12 @@
 	  const commands = clone.querySelector('.commands');
 	  const commandTemplate = document.getElementById('command-template');
 
-	  for (const [key, { name, url }] of COMMANDS.entries()) {
-		if (!name || !url) continue;
+	  for(const [key, { name, url }] of COMMANDS.entries()) {
+		if(!name || !url) continue;
 		const clone = commandTemplate.content.cloneNode(true);
 		const command = clone.querySelector('.command');
 		command.href = url;
-		if (CONFIG.openLinksInNewTab) command.target = '_blank';
+		if(CONFIG.openLinksInNewTab) command.target = '_blank';
 		clone.querySelector('.key').innerText = key;
 		clone.querySelector('.name').innerText = name;
 		commands.append(clone);
@@ -347,8 +375,8 @@ button {
 		window.autocompleteCallback = (res) => {
 		  const suggestions = [];
 
-		  for (const item of res) {
-			if (item.phrase === search.toLowerCase()) continue;
+		  for(const item of res) {
+			if(item.phrase === search.toLowerCase()) continue;
 			suggestions.push(item.phrase);
 		  }
 
@@ -363,7 +391,7 @@ button {
 	}
 
 	static #formatSearchUrl(url, searchPath, search) {
-	  if (!searchPath) return url;
+	  if(!searchPath) return url;
 	  const [baseUrl] = Search.#splitUrl(url);
 	  const urlQuery = encodeURIComponent(search);
 	  searchPath = searchPath.replace(/{}/g, urlQuery);
@@ -381,12 +409,12 @@ button {
 	static #parseQuery = (raw) => {
 	  const query = raw.trim();
 
-	  if (this.#isUrl(query)) {
+	  if(this.#isUrl(query)) {
 		const url = this.#hasProtocol(query) ? query : `https://${query}`;
 		return { query, url };
 	  }
 
-	  if (COMMANDS.has(query)) {
+	  if(COMMANDS.has(query)) {
 		const { command, key, url } = COMMANDS.get(query);
 		return command ? Search.#parseQuery(command) : { key, query, url };
 	  }
@@ -394,7 +422,7 @@ button {
 	  let splitBy = CONFIG.commandSearchDelimiter;
 	  const [searchKey, rawSearch] = query.split(new RegExp(`${splitBy}(.*)`));
 
-	  if (COMMANDS.has(searchKey)) {
+	  if(COMMANDS.has(searchKey)) {
 		const { searchTemplate, url: base } = COMMANDS.get(searchKey);
 		const search = rawSearch.trim();
 		const url = Search.#formatSearchUrl(base, searchTemplate, search);
@@ -404,7 +432,7 @@ button {
 	  splitBy = CONFIG.commandPathDelimiter;
 	  const [pathKey, path] = query.split(new RegExp(`${splitBy}(.*)`));
 
-	  if (COMMANDS.has(pathKey)) {
+	  if(COMMANDS.has(pathKey)) {
 		const { url: base } = COMMANDS.get(pathKey);
 		const [baseUrl] = Search.#splitUrl(base);
 		const url = `${baseUrl}/${path}`;
@@ -442,7 +470,7 @@ button {
 	  const active = this.shadowRoot.activeElement;
 	  let nextIndex;
 
-	  if (active.dataset.index) {
+	  if(active.dataset.index) {
 		const activeIndex = Number(active.dataset.index);
 		nextIndex = previous ? activeIndex - 1 : activeIndex + 1;
 	  } else {
@@ -450,50 +478,65 @@ button {
 	  }
 
 	  const next = this.#suggestions.children[nextIndex];
-	  if (next) next.querySelector('.suggestion').focus();
+	  if(next) next.querySelector('.suggestion').focus();
 	  else this.#input.focus();
 	}
 
-	#onInput = async () => {
+  #onInput = async () => {
 	  const oq = Search.#parseQuery(this.#input.value);
 
-	  if (!oq.query) {
+	  if(!oq.query) {
 		this.#close();
 		return;
 	  }
 
 	  let suggestions = COMMANDS.get(oq.query)?.suggestions ?? [];
-
-	  if (oq.search && suggestions.length < CONFIG.suggestionLimit) {
-		const res = await Search.#fetchDuckDuckGoSuggestions(oq.search);
-
-		suggestions = suggestions.concat(
-		oq.splitBy
-		? res.map((search) => `${oq.key}${oq.splitBy}${search}`)
-			: res
-		);
-	  }
-
+	  // Check if the query has changed before rendering suggestions.
 	  const nq = Search.#parseQuery(this.#input.value);
-	  if (nq.query !== oq.query) return;
+	  if(nq.query !== oq.query) return;
+
 	  this.#renderSuggestions(suggestions, oq.query);
 	};
 
+//	#onInput = async () => {
+//	  const oq = Search.#parseQuery(this.#input.value);
+//
+//	  if(!oq.query) {
+//		this.#close();
+//		return;
+//	  }
+//
+//	  let suggestions = COMMANDS.get(oq.query)?.suggestions ?? [];
+//
+//	  if(oq.search && suggestions.length < CONFIG.suggestionLimit) {
+//		const res = await Search.#fetchDuckDuckGoSuggestions(oq.search);
+//
+//		suggestions = suggestions.concat(
+//		oq.splitBy
+//		? res.map((search) => `${oq.key}${oq.splitBy}${search}`)
+//			: res
+//		);
+//	  }
+//	  const nq = Search.#parseQuery(this.#input.value);
+//    if(nq.query !== oq.query) return;
+//	  this.#renderSuggestions(suggestions, oq.query);
+//	};
+
 	#onKeydown = (e) => {
-	  if (!this.#dialog.open) {
+	  if(!this.#dialog.open) {
 		this.#dialog.show();
 		this.#input.focus();
 
 		requestAnimationFrame(() => {
 		  // close the search dialog before the next repaint if a character is
 		  // not produced (e.g. if you type shift, control, alt etc.)
-		  if (!this.#input.value) this.#close();
+		  if(!this.#input.value) this.#close();
 		});
 
 		return;
 	  }
 
-	  if (e.key === 'Escape') {
+	  if(e.key === 'Escape') {
 		this.#close();
 		return;
 	  }
@@ -504,13 +547,13 @@ button {
 	  const shift = e.shiftKey ? 'shift-' : '';
 	  const modifierPrefixedKey = `${alt}${ctrl}${meta}${shift}${e.key}`;
 
-	  if (/^(ArrowDown|Tab|ctrl-n)$/.test(modifierPrefixedKey)) {
+	  if(/^(ArrowDown|Tab|ctrl-n)$/.test(modifierPrefixedKey)) {
 		e.preventDefault();
 		this.#focusNextSuggestion();
 		return;
 	  }
 
-	  if (/^(ArrowUp|ctrl-p|shift-Tab)$/.test(modifierPrefixedKey)) {
+	  if(/^(ArrowUp|ctrl-p|shift-Tab)$/.test(modifierPrefixedKey)) {
 		e.preventDefault();
 		this.#focusNextSuggestion(true);
 	  }
@@ -522,7 +565,7 @@ button {
 
 	#onSuggestionClick = (e) => {
 	  const ref = e.target.closest('.suggestion');
-	  if (!ref) return;
+	  if(!ref) return;
 	  this.#execute(ref.dataset.suggestion);
 	};
 
@@ -531,7 +574,7 @@ button {
 	  const sliced = suggestions.slice(0, CONFIG.suggestionLimit);
 	  const template = document.getElementById('suggestion-template');
 
-	  for (const [index, suggestion] of sliced.entries()) {
+	  for(const [index, suggestion] of sliced.entries()) {
 		const clone = template.content.cloneNode(true);
 		const ref = clone.querySelector('.suggestion');
 		ref.dataset.index = index;
@@ -539,7 +582,7 @@ button {
 		const escapedQuery = Search.#escapeRegexCharacters(query);
 		const matched = suggestion.match(new RegExp(escapedQuery, 'i'));
 
-		if (matched) {
+		if(matched) {
 		  const template = document.getElementById('match-template');
 		  const clone = template.content.cloneNode(true);
 		  const matchRef = clone.querySelector('.match');
