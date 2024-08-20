@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 
 <style>
-	@font-face {
-		font-family: 'JetBrains';
-		src: local('JetBrains Mono Nerd Font'), local('JetBrainsMonoNerdFont_Regular'), url('assets/fonts/jetbrainsmono/JetBrainsMonoNerdFont_Regular.ttf') format('truetype');
-	}
+@font-face {
+	font-family: 'JetBrains';
+	src: local('JetBrains Mono Nerd Font'), local('JetBrainsMonoNerdFont_Regular'), url('assets/fonts/jetbrainsmono/JetBrainsMonoNerdFont_Regular.ttf') format('truetype');
+}
 	:root {
 		--border-radius: 1rem;
 		--color-background: #111;
@@ -79,9 +79,12 @@
 		['g', {
 			name: 'GitHub',
 			suggestions: [
-				'g/clamsfeel2/Vault',
-				'g/clamsfeel2/tilde',
-				'g/clamsfeel2/memify',
+				{ command: 'g/clamsfeel2/Vault', label: 'vault' },
+				{ command:
+					'g/clamsfeel2/Vault/blob/main/MD/School/Fall2024/README.md#sections', label:
+					'school' },
+				{ command: 'g/clamsfeel2/tilde', label: 'tilde' },
+				{ command: 'g/clamsfeel2/memify', label: 'memify' },
 			],
 			url: 'https://github.com/clamsfeel2',
 			searchTemplate: '/search?q={}'
@@ -481,20 +484,24 @@ button {
 	  else this.#input.focus();
 	}
 
-  #onInput = async () => {
-	  const oq = Search.#parseQuery(this.#input.value);
+	#onInput = async () => {
+		const oq = Search.#parseQuery(this.#input.value);
 
-	  if(!oq.query) {
-		this.#close();
-		return;
-	  }
+		if (!oq.query) {
+			this.#close();
+			return;
+		}
 
-	  let suggestions = COMMANDS.get(oq.query)?.suggestions ?? [];
-	  // Check if the query has changed before rendering suggestions.
-	  const nq = Search.#parseQuery(this.#input.value);
-	  if(nq.query !== oq.query) return;
+		let suggestions = COMMANDS.get(oq.query)?.suggestions ?? [];
+		const nq = Search.#parseQuery(this.#input.value);
+		if (nq.query !== oq.query) return;
 
-	  this.#renderSuggestions(suggestions, oq.query);
+		this.#renderSuggestions(suggestions.map(suggestion => {
+			if (typeof suggestion === "string") {
+				return { command: suggestion, label: suggestion };
+			}
+			return suggestion;
+		}), oq.query);
 	};
 
 //	#onInput = async () => {
@@ -568,36 +575,40 @@ button {
 	  this.#execute(ref.dataset.suggestion);
 	};
 
-	#renderSuggestions(suggestions, query) {
-	  this.#suggestions.innerHTML = '';
-	  const sliced = suggestions.slice(0, CONFIG.suggestionLimit);
-	  const template = document.getElementById('suggestion-template');
+   #renderSuggestions(suggestions, query) {
+		this.#suggestions.innerHTML = '';
+		const sliced = suggestions.slice(0, CONFIG.suggestionLimit);
+		const template = document.getElementById('suggestion-template');
 
-	  for(const [index, suggestion] of sliced.entries()) {
-		const clone = template.content.cloneNode(true);
-		const ref = clone.querySelector('.suggestion');
-		ref.dataset.index = index;
-		ref.dataset.suggestion = suggestion;
-		const escapedQuery = Search.#escapeRegexCharacters(query);
-		const matched = suggestion.match(new RegExp(escapedQuery, 'i'));
+		for (const [index, suggestion] of sliced.entries()) {
+			const clone = template.content.cloneNode(true);
+			const ref = clone.querySelector('.suggestion');
+			ref.dataset.index = index;
+			ref.dataset.suggestion = suggestion.command;
 
-		if(matched) {
-		  const template = document.getElementById('match-template');
-		  const clone = template.content.cloneNode(true);
-		  const matchRef = clone.querySelector('.match');
-		  const pre = suggestion.slice(0, matched.index);
-		  const post = suggestion.slice(matched.index + matched[0].length);
-		  matchRef.innerText = matched[0];
-		  matchRef.insertAdjacentHTML('beforebegin', pre);
-		  matchRef.insertAdjacentHTML('afterend', post);
-		  ref.append(clone);
-		} else {
-		  ref.innerText = suggestion;
+			const displayText = suggestion.label || suggestion.command;
+			const escapedQuery = Search.#escapeRegexCharacters(query);
+			const matched = displayText.match(new RegExp(escapedQuery, 'i'));
+
+			if (matched) {
+				const template = document.getElementById('match-template');
+				const clone = template.content.cloneNode(true);
+				const matchRef = clone.querySelector('.match');
+				const pre = displayText.slice(0, matched.index);
+				const post = displayText.slice(matched.index +
+  matched[0].length);
+				matchRef.innerText = matched[0];
+				matchRef.insertAdjacentHTML('beforebegin', pre);
+				matchRef.insertAdjacentHTML('afterend', post);
+				ref.append(clone);
+			} else {
+				ref.innerText = displayText;
+			}
+
+			this.#suggestions.append(clone);
 		}
-
-		this.#suggestions.append(clone);
-	  }
 	}
+
   }
 
   customElements.define('search-component', Search);
